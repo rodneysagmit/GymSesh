@@ -1,182 +1,349 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Bundled Page</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #fdfdfb; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-    #__bundler_loading { position: fixed; bottom: 20px; right: 20px; font: 13px/1.4 -apple-system, BlinkMacSystemFont, sans-serif; color: #666; background: #fff; padding: 8px 14px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); z-index: 10000; }
-    #__bundler_thumbnail { position: fixed; inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #fdfdfb; z-index: 9999; }
-    #__bundler_thumbnail svg { width: 100%; height: 100%; object-fit: contain; }
-    #__bundler_placeholder { color: #999; font-size: 14px; }
-  </style>
-  <noscript>
-    <style>#__bundler_loading { display: none; }</style>
-    <div style="position:fixed;bottom:12px;left:12px;font:13px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;color:#999;background:rgba(255,255,255,0.9);padding:6px 12px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);z-index:10000;">
-      This page requires JavaScript to display.
-    </div>
-  </noscript>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fdfdfb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>GymSesh</title>
+<style>
+  :root { --bg:#fdfdfb; --ink:#1a1a1a; --muted:#6f6c66; --faint:#a3a099; --line:#e3e0d8; --field:#dcd9d1; --soft:#f1efe9;
+    --g:oklch(0.6 0.15 150); --g-ink:oklch(0.4 0.13 150); --g-soft:oklch(0.6 0.15 150 / 0.14); --warn:#9a6b00; --warn-soft:#fbf0d2; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Helvetica, Arial, sans-serif; line-height: 1.35; -webkit-tap-highlight-color: transparent; }
+  input, textarea, select, button { font-family: inherit; color: inherit; }
+  ::placeholder { color: #b3b0aa; }
+  details > summary { cursor: pointer; list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 16px 16px calc(60px + env(safe-area-inset-bottom, 0px)); }
+  .top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
+  .title { font-size:22px; font-weight:700; letter-spacing:-0.01em; }
+  .sub { font-size:12px; color:#8a8781; }
+  .btn { border:1px solid #d8d5cd; background:#fff; color:var(--ink); font-size:12px; font-weight:600; padding:8px 10px; border-radius:7px; cursor:pointer; }
+  .btn.dark { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .btn.green { border-color:var(--g); background:oklch(0.6 0.15 150 / 0.1); color:var(--g-ink); }
+  .btn.block { width:100%; font-size:13px; font-weight:700; padding:12px 0; border-radius:9px; }
+  .card { border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:12px; }
+  .label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.03em; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .field { display:flex; flex-direction:column; gap:4px; min-width:0; }
+  .grid2 > * { min-width:0; }
+  .row > .in { flex:1; min-width:0; }
+  .in { border:1px solid var(--field); border-radius:7px; padding:8px; font-size:14px; background:#fff; width:100%; min-width:0; }
+  textarea.in { resize: vertical; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { border:1px solid var(--field); background:#fff; color:#4a4844; font-size:12px; font-weight:600; padding:7px 11px; border-radius:20px; cursor:pointer; }
+  .chip.on, .en.on { background:var(--g-soft); color:var(--g-ink); border-color:var(--g); }
+  .en { flex:1; border:1px solid var(--field); background:#fff; color:#4a4844; font-size:14px; font-weight:700; padding:9px 0; border-radius:8px; cursor:pointer; }
+  .exhead { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .num { width:26px; height:26px; border-radius:7px; background:var(--g-soft); color:var(--g-ink); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .exname { flex:1; min-width:0; border:none; border-bottom:1px solid var(--field); padding:6px 2px; font-size:15px; font-weight:600; background:transparent; }
+  .x { border:none; background:transparent; color:#b3b0aa; font-size:18px; line-height:1; padding:4px; cursor:pointer; }
+  .setgrid { display:grid; grid-template-columns:26px 1fr 1fr 1fr 40px 20px; gap:6px; align-items:center; }
+  .sethdr { font-size:10px; font-weight:600; color:var(--faint); text-transform:uppercase; letter-spacing:0.02em; padding:0 2px 4px; text-align:center; }
+  .setrow { margin-bottom:6px; padding-bottom:6px; border-bottom:1px solid var(--soft); }
+  .setrow input.s { width:100%; min-width:0; border:1px solid var(--field); border-radius:6px; padding:7px 4px; font-size:14px; text-align:center; background:#fff; }
+  .setrow.warm input.s { background:var(--warn-soft); }
+  .setno { font-size:13px; font-weight:700; color:#8a8781; text-align:center; border:none; background:transparent; padding:4px 0; border-radius:6px; cursor:pointer; }
+  .setrow.warm .setno { color:var(--warn); background:var(--warn-soft); }
+  .setnote { width:100%; margin-top:5px; border:none; background:transparent; font-size:12px; color:var(--muted); padding:2px; }
+  .prev { font-size:11px; color:var(--faint); margin:-4px 0 8px 34px; }
+  .addset { border:1px dashed #d8d5cd; background:transparent; color:var(--muted); font-size:12px; font-weight:600; padding:6px 10px; border-radius:7px; margin-top:2px; cursor:pointer; }
+  details.card summary { font-size:14px; font-weight:600; }
+  .hint { text-align:center; font-size:11px; color:var(--faint); margin:6px 0 20px; }
+  .banner { border:1px solid var(--g); background:oklch(0.6 0.15 150 / 0.08); border-radius:10px; padding:12px 14px; margin-bottom:14px; font-size:13px; }
+  .banner.warn { border-color:#e0c06a; background:var(--warn-soft); }
+  .banner b { font-weight:700; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .muted { color:var(--muted); } .small { font-size:12px; }
+  .hist-item { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--soft); font-size:13px; }
+  .hist-item:last-child { border-bottom:0; }
+  .pill { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:2px 6px; border-radius:5px; }
+  .pill.todo { background:var(--warn-soft); color:var(--warn); } .pill.done { background:var(--g-soft); color:var(--g-ink); }
+  .toast { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(20px + env(safe-area-inset-bottom, 0px)); background:var(--ink); color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; z-index:10; max-width:calc(100vw - 32px); }
+  [hidden] { display:none !important; }
+  :focus-visible { outline:2px solid var(--g); outline-offset:2px; }
+</style>
 </head>
 <body>
-  <div id="__bundler_thumbnail">
-  <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-    <rect width="120" height="120" fill="#fdfdfb"></rect>
-    <rect x="30" y="34" width="60" height="52" rx="8" fill="none" stroke="#1a1a1a" stroke-width="4"></rect>
-    <line x1="30" y1="52" x2="90" y2="52" stroke="#1a1a1a" stroke-width="4"></line>
-    <circle cx="42" cy="70" r="6" fill="oklch(0.6 0.15 150)"></circle>
-    <line x1="56" y1="70" x2="80" y2="70" stroke="#1a1a1a" stroke-width="4"></line>
-  </svg>
-</div>
-  <div id="__bundler_loading">Unpacking...</div>
+<div class="wrap" id="app"></div>
+<datalist id="exList"></datalist>
+<script>
+"use strict";
+/* ---------- storage ---------- */
+const KEY_DRAFT = "gymsesh.draft.v2", KEY_HIST = "gymsesh.history.v2";
+const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch (e) { return d; } };
+const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
 
-  <script>
-    
-document.addEventListener('DOMContentLoaded', async function() {
-  const loading = document.getElementById('__bundler_loading');
-  function setStatus(msg) { if (loading) loading.textContent = msg; }
+/* ---------- helpers ---------- */
+const pad = n => String(n).padStart(2, "0");
+const localDate = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; // LA date, not UTC
+const nowHM = () => { const d = new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const daysBetween = (a, b) => Math.round((new Date(b + "T00:00:00") - new Date(a + "T00:00:00")) / 86400000);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtDay = iso => new Date(iso + "T00:00:00").toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+const $ = s => document.querySelector(s);
 
-  // Error sink persists across replaceWith since it's on window, not the DOM.
-  window.addEventListener('error', function(e) {
-    var p = document.body || document.documentElement;
-    var d = document.getElementById('__bundler_err') || p.appendChild(document.createElement('div'));
-    d.id = '__bundler_err';
-    d.style.cssText = 'position:fixed;bottom:12px;left:12px;right:12px;font:12px/1.4 ui-monospace,monospace;background:#2a1215;color:#ff8a80;padding:10px 14px;border-radius:8px;border:1px solid #5c2b2e;z-index:99999;white-space:pre-wrap;max-height:40vh;overflow:auto';
-    d.textContent = (d.textContent ? d.textContent + String.fromCharCode(10) : '') +
-      '[bundle] ' + (e.message || e.type) +
-      (e.filename ? ' (' + e.filename.slice(0, 60) + ':' + e.lineno + ')' : '');
-  }, true);
+/* Canonical names (match workout-log.csv and Lift Dashboard) */
+const EXERCISES = ["Bench Press (Barbell)", "Barbell Squat", "Deadlift", "Barbell Bent-Over Row", "Overhead Press", "Romanian Deadlift",
+  "Dumbbell Bench Press", "Incline DB Bench Press", "Incline Bench Press (Barbell)", "DB Shoulder Press", "Lateral Raises (DB)", "Pec Flies Machine", "Chest Press Machine",
+  "Tricep Rope Pushdown", "Overhead Cable Tricep Extension (Rope)", "Overhead Tricep Cable Extension (Single Arm)", "Overhead DB Extension",
+  "Lat Pulldown", "Seated Cable Row", "Lever Row", "Rear Delt Fly", "Face Pulls", "Pull-ups", "EZ Bar Curl", "Bicep Curl Machine", "Dumbbell Hammer Curls",
+  "Leg Press Machine", "Leg Extension Machine", "Seated Leg Curl", "Hamstring Curl Machine", "Adduction Machine", "Abduction Machine", "Goblet Squat", "Calf Raise", "Ab Crunch Machine"];
+const FOCUS_OPTIONS = ["Push", "Pull", "Legs", "Upper Body", "Lower Body", "Full Body", "Cardio", "Mobility", "Custom"];
 
-  try {
-    const manifestEl = document.querySelector('script[type="__bundler/manifest"]');
-    const templateEl = document.querySelector('script[type="__bundler/template"]');
-    if (!manifestEl || !templateEl) {
-      setStatus('Error: missing bundle data');
-      console.error('[bundler] Missing script tags — manifestEl:', !!manifestEl, 'templateEl:', !!templateEl);
-      return;
-    }
-
-    const manifest = JSON.parse(manifestEl.textContent);
-    let template = JSON.parse(templateEl.textContent);
-
-    const uuids = Object.keys(manifest);
-    setStatus('Unpacking ' + uuids.length + ' assets...');
-
-    const blobUrls = {};
-    await Promise.all(uuids.map(async (uuid) => {
-      const entry = manifest[uuid];
-      try {
-        const binaryStr = atob(entry.data);
-        const bytes = new Uint8Array(binaryStr.length);
-        for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
-
-        let finalBytes = bytes;
-        if (entry.compressed) {
-          if (typeof DecompressionStream !== 'undefined') {
-            const ds = new DecompressionStream('gzip');
-            const writer = ds.writable.getWriter();
-            const reader = ds.readable.getReader();
-            writer.write(bytes);
-            writer.close();
-            const chunks = [];
-            let totalLen = 0;
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              chunks.push(value);
-              totalLen += value.length;
-            }
-            finalBytes = new Uint8Array(totalLen);
-            let offset = 0;
-            for (const chunk of chunks) { finalBytes.set(chunk, offset); offset += chunk.length; }
-          } else {
-            console.warn('DecompressionStream not available, asset ' + uuid + ' may not render');
-          }
-        }
-
-        blobUrls[uuid] = URL.createObjectURL(new Blob([finalBytes], { type: entry.mime }));
-      } catch (err) {
-        console.error('Failed to decode asset ' + uuid + ':', err);
-        blobUrls[uuid] = URL.createObjectURL(new Blob([], { type: entry.mime }));
-      }
-    }));
-
-    const extResEl = document.querySelector('script[type="__bundler/ext_resources"]');
-    const extResources = extResEl ? JSON.parse(extResEl.textContent) : [];
-    const resourceMap = {};
-    for (const entry of extResources) {
-      if (blobUrls[entry.uuid]) resourceMap[entry.id] = blobUrls[entry.uuid];
-    }
-
-    setStatus('Rendering...');
-    for (const uuid of uuids) template = template.split(uuid).join(blobUrls[uuid]);
-
-    // Strip integrity + crossorigin — blob URLs from a file:// document inherit
-    // a null origin, so crossorigin forces a CORS fetch that SRI then rejects.
-    // The manifest bytes are ours; SRI protects against CDN compromise, not this.
-    template = template.replace(/\s+integrity="[^"]*"/gi, '').replace(/\s+crossorigin="[^"]*"/gi, '');
-
-    const resourceScript = '<script>window.__resources = ' +
-      JSON.stringify(resourceMap).split('</' + 'script>').join('<\\/' + 'script>') +
-      ';</' + 'script>';
-    // Inject after <head> so the DOCTYPE stays first; prepending the script
-    // would push the parser into quirks mode. DOMParser always emits a <head>
-    // (synthesizing one if the source HTML omitted it) but may carry
-    // attributes through, so match the full opening tag. slice() rather than
-    // replace() keeps us clear of $-pattern substitution in resourceScript.
-    const headOpen = template.match(/<head[^>]*>/i);
-    if (headOpen) {
-      const i = headOpen.index + headOpen[0].length;
-      template = template.slice(0, i) + resourceScript + template.slice(i);
-    }
-
-    // Parse the template and swap the root element. Scripts inserted via
-    // DOMParser/replaceWith are inert per spec — re-create each with
-    // createElement so they execute, awaiting onload for src scripts to
-    // preserve ordering (React before ReactDOM before Babel before text/babel).
-    const doc = new DOMParser().parseFromString(template, 'text/html');
-    document.documentElement.replaceWith(doc.documentElement);
-    const dead = Array.from(document.scripts);
-    for (const old of dead) {
-      const s = document.createElement('script');
-      for (const a of old.attributes) s.setAttribute(a.name, a.value);
-      s.textContent = old.textContent;
-      // text/babel scripts with a src: fetch and inline. transformScriptTags
-      // does XHR against the src, but blob:null/ from a file:// origin is
-      // silently dropped. Inlining makes it a plain inline babel script,
-      // which transformScriptTags handles unconditionally.
-      if ((s.type === 'text/babel' || s.type === 'text/jsx') && s.src) {
-        const r = await fetch(s.src);
-        s.textContent = await r.text();
-        s.removeAttribute('src');
-      }
-      const p = s.src ? new Promise(function(r) { s.onload = s.onerror = r; }) : null;
-      old.replaceWith(s);
-      if (p) await p;
-    }
-    // Babel standalone auto-transforms type=text/babel on DOMContentLoaded,
-    // which fired before we swapped the document. Trigger manually if present.
-    if (window.Babel && typeof window.Babel.transformScriptTags === 'function') {
-      window.Babel.transformScriptTags();
-    }
-  } catch (err) {
-    setStatus('Error unpacking: ' + err.message);
-    console.error('Bundle unpack error:', err);
-  }
+const emptySet = () => ({ weight: "", reps: "", rest: "", rpe: "", notes: "", warm: false });
+const emptyExercise = n => ({ name: "", sets: Array.from({ length: n }, emptySet) });
+const blankState = () => ({
+  id: "w" + Date.now().toString(36),
+  header: { date: localDate(), start: "", end: "", gym: "", focus: "", energy: 0, notes: "" },
+  exercises: Array.from({ length: 4 }, () => emptyExercise(4)),
+  optional: { bodyWeight: "", measurements: "", warmup: "", cardio: { type: "", duration: "", distance: "" }, stretch: "", prs: "", pain: "", summary: "" },
 });
 
-  </script>
+let S = load(KEY_DRAFT, null) || blankState();
+let H = load(KEY_HIST, []); // [{id, savedAt, logged:false, state}]
+// migrate drafts from before warm-up flags existed
+S.exercises.forEach(e => e.sets.forEach(s => { if (s.warm == null) s.warm = false; }));
+let saveT;
+function persist() { clearTimeout(saveT); saveT = setTimeout(() => { if (!save(KEY_DRAFT, S)) toast("Couldn't save on this device. Copy your log before closing."); }, 250); }
+function persistHist() { save(KEY_HIST, H); }
 
-  <script type="__bundler/manifest">
-{"7c73ffd3-f905-47b4-8a73-ed7f81a4648d":{"mime":"text/javascript","compressed":true,"data":"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"}}
-  </script>
+/* ---------- history-derived helpers ---------- */
+function knownNames() { const s = new Set(EXERCISES); H.forEach(h => h.state.exercises.forEach(e => e.name && s.add(e.name.trim()))); return [...s].sort((a, b) => a.localeCompare(b)); }
+function lastFor(name) {
+  if (!name) return null; const k = name.trim().toLowerCase();
+  for (let i = H.length - 1; i >= 0; i--) { const h = H[i]; if (h.id === S.id) continue; const e = h.state.exercises.find(x => (x.name || "").trim().toLowerCase() === k); if (e) return { date: h.state.header.date, sets: e.sets.filter(st => st.weight || st.reps) }; }
+  return null;
+}
+function lastOfFocus(f) { for (let i = H.length - 1; i >= 0; i--) if (H[i].state.header.focus === f && H[i].id !== S.id) return H[i]; return null; }
+const hasContent = st => st.exercises.some(e => e.name || e.sets.some(s => s.weight || s.reps));
 
-  <script type="__bundler/ext_resources">
-[]
-  </script>
+/* ---------- text export (format read by /gym and Lift Dashboard) ---------- */
+function toText(s) {
+  const lines = ["WORKOUT LOG", `Date: ${s.header.date || "-"}`, `Time: ${s.header.start || "-"} to ${s.header.end || "-"}`, `Gym: ${s.header.gym || "-"}`, `Focus: ${s.header.focus || "-"}`, `Energy: ${s.header.energy || "-"}/5`];
+  if (s.header.notes) lines.push(`Notes: ${s.header.notes}`);
+  lines.push("", "EXERCISES");
+  let n = 0;
+  s.exercises.forEach(ex => {
+    if (!ex.name && !ex.sets.some(st => st.weight || st.reps)) return;
+    n++; lines.push(`${n}. ${ex.name || "(unnamed)"}`);
+    let k = 0;
+    ex.sets.forEach(st => {
+      if (!st.weight && !st.reps && !st.rest && !st.rpe && !st.notes) return;
+      k++; lines.push(`   Set ${k}${st.warm ? " (warm-up)" : ""}: ${st.weight || "-"} x ${st.reps || "-"} | rest ${st.rest || "-"} | RPE ${st.rpe || "-"}${st.notes ? " | " + st.notes : ""}`);
+    });
+  });
+  const o = s.optional; lines.push("", "OPTIONAL");
+  if (o.bodyWeight) lines.push(`Body weight: ${o.bodyWeight}`);
+  if (o.measurements) lines.push(`Measurements: ${o.measurements}`);
+  if (o.warmup) lines.push(`Warm-up: ${o.warmup}`);
+  if (o.cardio.type || o.cardio.duration || o.cardio.distance) lines.push(`Cardio: ${o.cardio.type || "-"}, ${o.cardio.duration || "-"}, ${o.cardio.distance || "-"}`);
+  if (o.stretch) lines.push(`Stretching: ${o.stretch}`);
+  if (o.prs) lines.push(`PRs: ${o.prs}`);
+  if (o.pain) lines.push(`Pain/form notes: ${o.pain}`);
+  if (o.summary) lines.push(`Summary: ${o.summary}`);
+  return lines.join("\n");
+}
 
-  <script type="__bundler/template">
-"<!DOCTYPE html>\n<html><head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\n<script src=\"7c73ffd3-f905-47b4-8a73-ed7f81a4648d\"><\u002Fscript>\n<\u002Fhead>\n<body>\n<x-dc>\n<helmet>\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <style>\n    @font-face { font-family: 'System'; src: local('Helvetica Neue'), local('Helvetica'), local('Arial'); }\n    * { box-sizing: border-box; }\n    body { margin: 0; -webkit-tap-highlight-color: transparent; }\n    input, textarea, select { font-family: inherit; }\n    ::placeholder { color: #b3b0aa; }\n    details > summary { cursor: pointer; list-style: none; }\n    details > summary::-webkit-details-marker { display: none; }\n  <\u002Fstyle>\n<\u002Fhelmet>\n<div style=\"font-family: Helvetica, Arial, sans-serif; background: #fdfdfb; color: #1a1a1a; min-height: 100vh; max-width: 640px; margin: 0 auto; padding: 16px 16px 60px; line-height: 1.35;\">\n\n  <!-- Top bar -->\n  <div style=\"display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:18px;\">\n    <div>\n      <div style=\"font-size:22px; font-weight:700; letter-spacing:-0.01em;\">Workout Tracker<\u002Fdiv>\n      <div style=\"font-size:12px; color:#8a8781;\">Log as you lift<\u002Fdiv>\n    <\u002Fdiv>\n    <div style=\"display:flex; gap:8px;\">\n      <button onclick=\"{{ loadExample }}\" style=\"border:1px solid #d8d5cd; background:#fff; color:#1a1a1a; font-size:12px; font-weight:600; padding:8px 10px; border-radius:7px;\">Example<\u002Fbutton>\n      <button onclick=\"{{ clearAll }}\" style=\"border:1px solid #d8d5cd; background:#fff; color:#1a1a1a; font-size:12px; font-weight:600; padding:8px 10px; border-radius:7px;\">Clear<\u002Fbutton>\n    <\u002Fdiv>\n  <\u002Fdiv>\n\n  <!-- Header info -->\n  <div style=\"border:1px solid #e3e0d8; border-radius:10px; padding:14px; margin-bottom:16px;\">\n    <div style=\"display:grid; grid-template-columns:1fr 1fr; gap:10px;\">\n      <label style=\"display:flex; flex-direction:column; gap:4px; font-size:11px; font-weight:600; color:#6f6c66; text-transform:uppercase; letter-spacing:0.03em;\">\n        Date\n        <input type=\"date\" value=\"{{ header.date }}\" onchange=\"{{ onDateChange }}\" style=\"border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; color:#1a1a1a; background:#fff;\">\n      <\u002Flabel>\n      <label style=\"display:flex; flex-direction:column; gap:4px; font-size:11px; font-weight:600; color:#6f6c66; text-transform:uppercase; letter-spacing:0.03em;\">\n        Gym / Location\n        <input type=\"text\" placeholder=\"e.g. Home gym\" value=\"{{ header.gym }}\" onchange=\"{{ onGymChange }}\" style=\"border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; color:#1a1a1a; background:#fff;\">\n      <\u002Flabel>\n      <label style=\"display:flex; flex-direction:column; gap:4px; font-size:11px; font-weight:600; color:#6f6c66; text-transform:uppercase; letter-spacing:0.03em;\">\n        Start Time\n        <input type=\"time\" value=\"{{ header.start }}\" onchange=\"{{ onStartChange }}\" style=\"border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; color:#1a1a1a; background:#fff;\">\n      <\u002Flabel>\n      <label style=\"display:flex; flex-direction:column; gap:4px; font-size:11px; font-weight:600; color:#6f6c66; text-transform:uppercase; letter-spacing:0.03em;\">\n        End Time\n        <input type=\"time\" value=\"{{ header.end }}\" onchange=\"{{ onEndChange }}\" style=\"border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; color:#1a1a1a; background:#fff;\">\n      <\u002Flabel>\n    <\u002Fdiv>\n\n    <div style=\"margin-top:12px;\">\n      <div style=\"font-size:11px; font-weight:600; color:#6f6c66; text-transform:uppercase; letter-spacing:0.03em; margin-bottom:6px;\">Workout Focus<\u002Fdiv>\n      <div style=\"display:flex; flex-wrap:wrap; gap:6px;\">\n        <sc-for list=\"{{ focusOptions }}\" as=\"opt\" hint-placeholder-count=\"9\">\n          <button onclick=\"{{ opt.onClick }}\" style=\"border:1px solid {{ opt.borderColor }}; background:{{ opt.bg }}; color:{{ opt.color }}; font-size:12px; font-weight:600; padding:7px 11px; border-radius:20px;\">{{ opt.label }}<\u002Fbutton>\n        <\u002Fsc-for>\n      <\u002Fdiv>\n    <\u002Fdiv>\n\n    <div style=\"margin-top:12px;\">\n      <div style=\"font-size:11px; font-weight:600; color:#6f6c66; text-transform:uppercase; letter-spacing:0.03em; margin-bottom:6px;\">Overall Energy (1–5)<\u002Fdiv>\n      <div style=\"display:flex; gap:6px;\">\n        <sc-for list=\"{{ energyOptions }}\" as=\"e\" hint-placeholder-count=\"5\">\n          <button onclick=\"{{ e.onClick }}\" style=\"flex:1; border:1px solid {{ e.borderColor }}; background:{{ e.bg }}; color:{{ e.color }}; font-size:14px; font-weight:700; padding:9px 0; border-radius:8px;\">{{ e.value }}<\u002Fbutton>\n        <\u002Fsc-for>\n      <\u002Fdiv>\n    <\u002Fdiv>\n\n    <label style=\"display:flex; flex-direction:column; gap:4px; font-size:11px; font-weight:600; color:#6f6c66; text-transform:uppercase; letter-spacing:0.03em; margin-top:12px;\">\n      Overall Workout Notes\n      <textarea placeholder=\"How did the session feel overall?\" value=\"{{ header.notes }}\" onchange=\"{{ onHeaderNotesChange }}\" rows=\"2\" style=\"border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; color:#1a1a1a; background:#fff; resize:vertical;\"><\u002Ftextarea>\n    <\u002Flabel>\n  <\u002Fdiv>\n\n  <!-- Exercises -->\n  <div style=\"font-size:11px; font-weight:600; color:#6f6c66; text-transform:uppercase; letter-spacing:0.03em; margin:18px 0 8px;\">Exercises<\u002Fdiv>\n\n  <sc-for list=\"{{ exercises }}\" as=\"ex\" hint-placeholder-count=\"6\">\n    <div style=\"border:1px solid #e3e0d8; border-radius:10px; padding:12px; margin-bottom:12px;\">\n      <div style=\"display:flex; align-items:center; gap:8px; margin-bottom:10px;\">\n        <div style=\"width:26px; height:26px; border-radius:7px; background:oklch(0.6 0.15 150 / 0.14); color:oklch(0.42 0.13 150); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0;\">{{ ex.displayOrder }}<\u002Fdiv>\n        <input type=\"text\" placeholder=\"Exercise name\" value=\"{{ ex.name }}\" onchange=\"{{ ex.onNameChange }}\" style=\"flex:1; border:none; border-bottom:1px solid #dcd9d1; padding:6px 2px; font-size:15px; font-weight:600; color:#1a1a1a; background:transparent;\">\n        <button onclick=\"{{ ex.onRemove }}\" style=\"border:none; background:transparent; color:#b3b0aa; font-size:18px; line-height:1; padding:4px;\">×<\u002Fbutton>\n      <\u002Fdiv>\n\n      <div style=\"display:grid; grid-template-columns:26px 1fr 1fr 1fr 40px 20px; gap:6px; font-size:10px; font-weight:600; color:#a3a099; text-transform:uppercase; letter-spacing:0.02em; padding:0 2px 4px; text-align:center;\">\n        <div>Set<\u002Fdiv><div>Weight<\u002Fdiv><div>Reps<\u002Fdiv><div>Rest<\u002Fdiv><div>RPE<\u002Fdiv><div><\u002Fdiv>\n      <\u002Fdiv>\n\n      <sc-for list=\"{{ ex.sets }}\" as=\"s\" hint-placeholder-count=\"4\">\n        <div style=\"margin-bottom:6px; padding-bottom:6px; border-bottom:1px solid #f1efe9;\">\n          <div style=\"display:grid; grid-template-columns:26px 1fr 1fr 1fr 40px 20px; gap:6px; align-items:center;\">\n            <div style=\"font-size:13px; font-weight:700; color:#8a8781; text-align:center;\">{{ s.displaySetNum }}<\u002Fdiv>\n            <input type=\"text\" inputmode=\"decimal\" placeholder=\"lb\" value=\"{{ s.weight }}\" onchange=\"{{ s.onWeightChange }}\" style=\"width:100%; min-width:0; box-sizing:border-box; border:1px solid #dcd9d1; border-radius:6px; padding:7px 4px; font-size:14px; text-align:center; background:#fff;\">\n            <input type=\"text\" inputmode=\"numeric\" placeholder=\"#\" value=\"{{ s.reps }}\" onchange=\"{{ s.onRepsChange }}\" style=\"width:100%; min-width:0; box-sizing:border-box; border:1px solid #dcd9d1; border-radius:6px; padding:7px 4px; font-size:14px; text-align:center; background:#fff;\">\n            <input type=\"text\" placeholder=\"90s\" value=\"{{ s.rest }}\" onchange=\"{{ s.onRestChange }}\" style=\"width:100%; min-width:0; box-sizing:border-box; border:1px solid #dcd9d1; border-radius:6px; padding:7px 4px; font-size:14px; text-align:center; background:#fff;\">\n            <input type=\"text\" inputmode=\"numeric\" placeholder=\"-\" value=\"{{ s.rpe }}\" onchange=\"{{ s.onRpeChange }}\" style=\"width:100%; min-width:0; box-sizing:border-box; border:1px solid #dcd9d1; border-radius:6px; padding:7px 2px; font-size:14px; text-align:center; background:#fff;\">\n            <button onclick=\"{{ s.onRemove }}\" style=\"border:none; background:transparent; color:#c9c6bf; font-size:15px; line-height:1;\">×<\u002Fbutton>\n          <\u002Fdiv>\n          <input type=\"text\" placeholder=\"Set note (form, pain, PR...)\" value=\"{{ s.notes }}\" onchange=\"{{ s.onNotesChange }}\" style=\"width:100%; margin-top:5px; border:none; background:transparent; font-size:12px; color:#6f6c66; padding:2px;\">\n        <\u002Fdiv>\n      <\u002Fsc-for>\n\n      <button onclick=\"{{ ex.onAddSet }}\" style=\"border:1px dashed #d8d5cd; background:transparent; color:#6f6c66; font-size:12px; font-weight:600; padding:6px 10px; border-radius:7px; margin-top:2px;\">+ Add Set<\u002Fbutton>\n    <\u002Fdiv>\n  <\u002Fsc-for>\n\n  <button onclick=\"{{ addExercise }}\" style=\"width:100%; border:1px solid oklch(0.6 0.15 150); background:oklch(0.6 0.15 150 / 0.1); color:oklch(0.4 0.13 150); font-size:13px; font-weight:700; padding:11px 0; border-radius:9px; margin-bottom:20px;\">+ Add Exercise<\u002Fbutton>\n\n  <!-- Optional sections -->\n  <div style=\"font-size:11px; font-weight:600; color:#6f6c66; text-transform:uppercase; letter-spacing:0.03em; margin:6px 0 8px;\">Optional<\u002Fdiv>\n\n  <details style=\"border:1px solid #e3e0d8; border-radius:10px; margin-bottom:8px; padding:12px;\">\n    <summary style=\"font-size:14px; font-weight:600;\">Body Weight &amp; Measurements<\u002Fsummary>\n    <div style=\"margin-top:10px; display:grid; gap:8px;\">\n      <input type=\"text\" placeholder=\"Body weight, e.g. 178 lb\" value=\"{{ optional.bodyWeight }}\" onchange=\"{{ onBodyWeightChange }}\" style=\"border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; background:#fff;\">\n      <input type=\"text\" placeholder=\"Measurements, e.g. waist 33in, arm 15in\" value=\"{{ optional.measurements }}\" onchange=\"{{ onMeasurementsChange }}\" style=\"border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; background:#fff;\">\n    <\u002Fdiv>\n  <\u002Fdetails>\n\n  <details style=\"border:1px solid #e3e0d8; border-radius:10px; margin-bottom:8px; padding:12px;\">\n    <summary style=\"font-size:14px; font-weight:600;\">Warm-up Notes<\u002Fsummary>\n    <textarea placeholder=\"What you did to warm up\" value=\"{{ optional.warmup }}\" onchange=\"{{ onWarmupChange }}\" rows=\"2\" style=\"width:100%; margin-top:10px; border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; background:#fff; resize:vertical;\"><\u002Ftextarea>\n  <\u002Fdetails>\n\n  <details style=\"border:1px solid #e3e0d8; border-radius:10px; margin-bottom:8px; padding:12px;\">\n    <summary style=\"font-size:14px; font-weight:600;\">Cardio Completed<\u002Fsummary>\n    <div style=\"margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:8px;\">\n      <input type=\"text\" placeholder=\"Type, e.g. Incline walk\" value=\"{{ optional.cardio.type }}\" onchange=\"{{ onCardioTypeChange }}\" style=\"border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; background:#fff;\">\n      <input type=\"text\" placeholder=\"Duration, e.g. 20 min\" value=\"{{ optional.cardio.duration }}\" onchange=\"{{ onCardioDurationChange }}\" style=\"border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; background:#fff;\">\n      <input type=\"text\" placeholder=\"Distance (optional)\" value=\"{{ optional.cardio.distance }}\" onchange=\"{{ onCardioDistanceChange }}\" style=\"border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; background:#fff; grid-column: span 2;\">\n    <\u002Fdiv>\n  <\u002Fdetails>\n\n  <details style=\"border:1px solid #e3e0d8; border-radius:10px; margin-bottom:8px; padding:12px;\">\n    <summary style=\"font-size:14px; font-weight:600;\">Stretching / Mobility<\u002Fsummary>\n    <textarea placeholder=\"What you stretched or mobilized\" value=\"{{ optional.stretch }}\" onchange=\"{{ onStretchChange }}\" rows=\"2\" style=\"width:100%; margin-top:10px; border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; background:#fff; resize:vertical;\"><\u002Ftextarea>\n  <\u002Fdetails>\n\n  <details style=\"border:1px solid #e3e0d8; border-radius:10px; margin-bottom:8px; padding:12px;\">\n    <summary style=\"font-size:14px; font-weight:600;\">Personal Records<\u002Fsummary>\n    <textarea placeholder=\"e.g. Bench 185lb x 5 - new PR\" value=\"{{ optional.prs }}\" onchange=\"{{ onPrsChange }}\" rows=\"2\" style=\"width:100%; margin-top:10px; border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; background:#fff; resize:vertical;\"><\u002Ftextarea>\n  <\u002Fdetails>\n\n  <details style=\"border:1px solid #e3e0d8; border-radius:10px; margin-bottom:8px; padding:12px;\">\n    <summary style=\"font-size:14px; font-weight:600;\">Pain / Discomfort / Form Notes<\u002Fsummary>\n    <textarea placeholder=\"Anything that hurt or felt off\" value=\"{{ optional.pain }}\" onchange=\"{{ onPainChange }}\" rows=\"2\" style=\"width:100%; margin-top:10px; border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; background:#fff; resize:vertical;\"><\u002Ftextarea>\n  <\u002Fdetails>\n\n  <details style=\"border:1px solid #e3e0d8; border-radius:10px; margin-bottom:20px; padding:12px;\">\n    <summary style=\"font-size:14px; font-weight:600;\">Workout Summary<\u002Fsummary>\n    <textarea placeholder=\"Quick recap for future you / ChatGPT\" value=\"{{ optional.summary }}\" onchange=\"{{ onSummaryChange }}\" rows=\"2\" style=\"width:100%; margin-top:10px; border:1px solid #dcd9d1; border-radius:7px; padding:8px; font-size:14px; background:#fff; resize:vertical;\"><\u002Ftextarea>\n  <\u002Fdetails>\n\n  <button onclick=\"{{ copyAsText }}\" style=\"width:100%; border:1px solid #1a1a1a; background:#1a1a1a; color:#fff; font-size:13px; font-weight:700; padding:12px 0; border-radius:9px; margin-bottom:10px;\">{{ copyLabel }}<\u002Fbutton>\n  <div style=\"text-align:center; font-size:11px; color:#a3a099; margin-bottom:20px;\">Copies a plain-text summary — paste into ChatGPT for analysis.<\u002Fdiv>\n\n  <details style=\"border:1px solid #e3e0d8; border-radius:10px; margin-bottom:8px; padding:12px;\">\n    <summary style=\"font-size:13px; font-weight:600; color:#6f6c66;\">How to use this tracker<\u002Fsummary>\n    <div style=\"margin-top:10px; font-size:13px; color:#4a4844;\">\n      <b>Before:<\u002Fb> fill in date, time, gym, focus, energy, warm-up.<br>\n      <b>During:<\u002Fb> after each set, log weight, reps, rest, RPE right away — add sets/exercises as you go.<br>\n      <b>After:<\u002Fb> fill in cardio, stretching, PRs, pain notes, and a one-line summary. Tap Copy and paste into ChatGPT to review progress.\n    <\u002Fdiv>\n  <\u002Fdetails>\n\n  <details style=\"border:1px solid #e3e0d8; border-radius:10px; margin-bottom:4px; padding:12px;\">\n    <summary style=\"font-size:13px; font-weight:600; color:#6f6c66;\">Tips to improve over time<\u002Fsummary>\n    <div style=\"margin-top:10px; font-size:13px; color:#4a4844;\">\n      Keep RPE on the same 1–10 scale every session so trends are comparable. Log body weight weekly, not daily. Save a copy of each session (screenshot or pasted text) so ChatGPT can compare across weeks. Only add fields you'll actually fill — an unused field slows you down more than it helps.\n    <\u002Fdiv>\n  <\u002Fdetails>\n\n<\u002Fdiv>\n\n<\u002Fx-dc>\n<script type=\"text/x-dc\" data-dc-script=\"\">\nfunction emptySet() { return { weight: '', reps: '', rest: '', rpe: '', notes: '' }; }\nfunction emptySets(n) { return Array.from({ length: n }, emptySet); }\nfunction emptyExercise(n) { return { name: '', sets: emptySets(n) }; }\n\nconst FOCUS_OPTIONS = ['Push', 'Pull', 'Legs', 'Upper Body', 'Lower Body', 'Full Body', 'Cardio', 'Mobility', 'Custom'];\n\nfunction blankState() {\n  return {\n    header: { date: new Date().toISOString().slice(0, 10), start: '', end: '', gym: '', focus: '', energy: 0, notes: '' },\n    exercises: Array.from({ length: 6 }, () => emptyExercise(4)),\n    optional: { bodyWeight: '', measurements: '', warmup: '', cardio: { type: '', duration: '', distance: '' }, stretch: '', prs: '', pain: '', summary: '' },\n  };\n}\n\nclass Component extends DCLogic {\n  state = { ...blankState(), copyLabel: 'Copy as Text' };\n\n  updateHeader(field, value) { this.setState(s => ({ header: { ...s.header, [field]: value } })); }\n  setFocus(value) { this.setState(s => ({ header: { ...s.header, focus: value } })); }\n  setEnergy(value) { this.setState(s => ({ header: { ...s.header, energy: value } })); }\n\n  updateExerciseName(i, value) {\n    this.setState(s => {\n      const exercises = s.exercises.slice();\n      exercises[i] = { ...exercises[i], name: value };\n      return { exercises };\n    });\n  }\n  addExercise() { this.setState(s => ({ exercises: [...s.exercises, emptyExercise(4)] })); }\n  removeExercise(i) { this.setState(s => ({ exercises: s.exercises.filter((_, idx) => idx !== i) })); }\n\n  updateSet(i, j, field, value) {\n    this.setState(s => {\n      const exercises = s.exercises.slice();\n      const sets = exercises[i].sets.slice();\n      sets[j] = { ...sets[j], [field]: value };\n      exercises[i] = { ...exercises[i], sets };\n      return { exercises };\n    });\n  }\n  addSet(i) {\n    this.setState(s => {\n      const exercises = s.exercises.slice();\n      exercises[i] = { ...exercises[i], sets: [...exercises[i].sets, emptySet()] };\n      return { exercises };\n    });\n  }\n  removeSet(i, j) {\n    this.setState(s => {\n      const exercises = s.exercises.slice();\n      exercises[i] = { ...exercises[i], sets: exercises[i].sets.filter((_, idx) => idx !== j) };\n      return { exercises };\n    });\n  }\n\n  updateOptional(field, value) { this.setState(s => ({ optional: { ...s.optional, [field]: value } })); }\n  updateCardio(field, value) { this.setState(s => ({ optional: { ...s.optional, cardio: { ...s.optional.cardio, [field]: value } } })); }\n\n  loadExample() {\n    this.setState({\n      header: { date: new Date().toISOString().slice(0, 10), start: '17:30', end: '18:35', gym: 'Iron Yard Gym', focus: 'Push', energy: 4, notes: 'Felt strong, shoulder a little tight at first but loosened up.' },\n      exercises: [\n        { name: 'Barbell Bench Press', sets: [\n          { weight: '135', reps: '10', rest: '90s', rpe: '5', notes: 'Warm-up' },\n          { weight: '185', reps: '8', rest: '2m', rpe: '7', notes: '' },\n          { weight: '205', reps: '5', rest: '2m', rpe: '8', notes: '' },\n          { weight: '205', reps: '4', rest: '2m', rpe: '9', notes: 'Grinded last rep' },\n        ]},\n        { name: 'Overhead Press', sets: [\n          { weight: '95', reps: '8', rest: '90s', rpe: '7', notes: '' },\n          { weight: '105', reps: '6', rest: '90s', rpe: '8', notes: '' },\n          { weight: '105', reps: '5', rest: '90s', rpe: '8', notes: 'PR' },\n          { weight: '', reps: '', rest: '', rpe: '', notes: '' },\n        ]},\n        { name: 'Incline Dumbbell Press', sets: [\n          { weight: '60', reps: '10', rest: '75s', rpe: '7', notes: '' },\n          { weight: '65', reps: '8', rest: '75s', rpe: '8', notes: '' },\n          { weight: '65', reps: '8', rest: '75s', rpe: '8', notes: '' },\n          { weight: '', reps: '', rest: '', rpe: '', notes: '' },\n        ]},\n        { name: 'Tricep Rope Pushdown', sets: [\n          { weight: '50', reps: '15', rest: '60s', rpe: '7', notes: '' },\n          { weight: '50', reps: '12', rest: '60s', rpe: '8', notes: '' },\n          { weight: '45', reps: '12', rest: '60s', rpe: '8', notes: 'Elbow felt fine' },\n          { weight: '', reps: '', rest: '', rpe: '', notes: '' },\n        ]},\n        emptyExercise(4),\n        emptyExercise(4),\n      ],\n      optional: {\n        bodyWeight: '178 lb',\n        measurements: 'Waist 33in, Arm 15in',\n        warmup: '5 min bike + band pull-aparts + light bench sets',\n        cardio: { type: 'Incline walk', duration: '10 min', distance: '0.5 mi' },\n        stretch: 'Chest doorway stretch, shoulder circles, 5 min',\n        prs: 'Overhead Press 105lb x 5 - new PR',\n        pain: 'Slight right shoulder tightness on first bench set, gone by set 2',\n        summary: 'Strong push day, OHP PR. Shoulder needs more warm-up next time.',\n      },\n    });\n  }\n\n  clearAll() { this.setState({ ...blankState(), copyLabel: 'Copy as Text' }); }\n\n  copyAsText() {\n    const s = this.state;\n    const lines = [];\n    lines.push('WORKOUT LOG');\n    lines.push(`Date: ${s.header.date || '-'}`);\n    lines.push(`Time: ${s.header.start || '-'} to ${s.header.end || '-'}`);\n    lines.push(`Gym: ${s.header.gym || '-'}`);\n    lines.push(`Focus: ${s.header.focus || '-'}`);\n    lines.push(`Energy: ${s.header.energy || '-'}/5`);\n    if (s.header.notes) lines.push(`Notes: ${s.header.notes}`);\n    lines.push('');\n    lines.push('EXERCISES');\n    s.exercises.forEach((ex, i) => {\n      if (!ex.name && !ex.sets.some(st => st.weight || st.reps)) return;\n      lines.push(`${i + 1}. ${ex.name || '(unnamed)'}`);\n      ex.sets.forEach((st, j) => {\n        if (!st.weight && !st.reps && !st.rest && !st.rpe && !st.notes) return;\n        lines.push(`   Set ${j + 1}: ${st.weight || '-'} x ${st.reps || '-'} | rest ${st.rest || '-'} | RPE ${st.rpe || '-'}${st.notes ? ' | ' + st.notes : ''}`);\n      });\n    });\n    const o = s.optional;\n    lines.push('');\n    lines.push('OPTIONAL');\n    if (o.bodyWeight) lines.push(`Body weight: ${o.bodyWeight}`);\n    if (o.measurements) lines.push(`Measurements: ${o.measurements}`);\n    if (o.warmup) lines.push(`Warm-up: ${o.warmup}`);\n    if (o.cardio.type || o.cardio.duration || o.cardio.distance) lines.push(`Cardio: ${o.cardio.type || '-'}, ${o.cardio.duration || '-'}, ${o.cardio.distance || '-'}`);\n    if (o.stretch) lines.push(`Stretching: ${o.stretch}`);\n    if (o.prs) lines.push(`PRs: ${o.prs}`);\n    if (o.pain) lines.push(`Pain/form notes: ${o.pain}`);\n    if (o.summary) lines.push(`Summary: ${o.summary}`);\n\n    const text = lines.join('\\n');\n    const done = () => { this.setState({ copyLabel: 'Copied!' }); setTimeout(() => this.setState({ copyLabel: 'Copy as Text' }), 1800); };\n    if (navigator.clipboard && navigator.clipboard.writeText) {\n      navigator.clipboard.writeText(text).then(done).catch(done);\n    } else {\n      done();\n    }\n  }\n\n  renderVals() {\n    const s = this.state;\n    const focusOptions = FOCUS_OPTIONS.map(label => {\n      const active = s.header.focus === label;\n      return {\n        label,\n        onClick: () => this.setFocus(active ? '' : label),\n        bg: active ? 'oklch(0.6 0.15 150 / 0.14)' : '#fff',\n        color: active ? 'oklch(0.4 0.13 150)' : '#4a4844',\n        borderColor: active ? 'oklch(0.6 0.15 150)' : '#dcd9d1',\n      };\n    });\n    const energyOptions = [1, 2, 3, 4, 5].map(value => {\n      const active = s.header.energy === value;\n      return {\n        value,\n        onClick: () => this.setEnergy(active ? 0 : value),\n        bg: active ? 'oklch(0.6 0.15 150 / 0.14)' : '#fff',\n        color: active ? 'oklch(0.4 0.13 150)' : '#4a4844',\n        borderColor: active ? 'oklch(0.6 0.15 150)' : '#dcd9d1',\n      };\n    });\n    const exercises = s.exercises.map((ex, i) => ({\n      name: ex.name,\n      displayOrder: i + 1,\n      onNameChange: e => this.updateExerciseName(i, e.target.value),\n      onRemove: () => this.removeExercise(i),\n      onAddSet: () => this.addSet(i),\n      sets: ex.sets.map((st, j) => ({\n        ...st,\n        displaySetNum: j + 1,\n        onWeightChange: e => this.updateSet(i, j, 'weight', e.target.value),\n        onRepsChange: e => this.updateSet(i, j, 'reps', e.target.value),\n        onRestChange: e => this.updateSet(i, j, 'rest', e.target.value),\n        onRpeChange: e => this.updateSet(i, j, 'rpe', e.target.value),\n        onNotesChange: e => this.updateSet(i, j, 'notes', e.target.value),\n        onRemove: () => this.removeSet(i, j),\n      })),\n    }));\n\n    return {\n      header: s.header,\n      exercises,\n      optional: s.optional,\n      focusOptions,\n      energyOptions,\n      copyLabel: s.copyLabel,\n      onDateChange: e => this.updateHeader('date', e.target.value),\n      onGymChange: e => this.updateHeader('gym', e.target.value),\n      onStartChange: e => this.updateHeader('start', e.target.value),\n      onEndChange: e => this.updateHeader('end', e.target.value),\n      onHeaderNotesChange: e => this.updateHeader('notes', e.target.value),\n      onBodyWeightChange: e => this.updateOptional('bodyWeight', e.target.value),\n      onMeasurementsChange: e => this.updateOptional('measurements', e.target.value),\n      onWarmupChange: e => this.updateOptional('warmup', e.target.value),\n      onCardioTypeChange: e => this.updateCardio('type', e.target.value),\n      onCardioDurationChange: e => this.updateCardio('duration', e.target.value),\n      onCardioDistanceChange: e => this.updateCardio('distance', e.target.value),\n      onStretchChange: e => this.updateOptional('stretch', e.target.value),\n      onPrsChange: e => this.updateOptional('prs', e.target.value),\n      onPainChange: e => this.updateOptional('pain', e.target.value),\n      onSummaryChange: e => this.updateOptional('summary', e.target.value),\n      addExercise: () => this.addExercise(),\n      loadExample: () => this.loadExample(),\n      clearAll: () => this.clearAll(),\n      copyAsText: () => this.copyAsText(),\n    };\n  }\n}\n\n<\u002Fscript>\n\n\n<\u002Fbody><\u002Fhtml>"
-  </script>
+/* ---------- copy / share ---------- */
+let toastT;
+function toast(m) { let el = $("#toast"); if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); } el.textContent = m; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 2200); }
+async function copyText(t, msg) {
+  try { await navigator.clipboard.writeText(t); toast(msg || "Copied"); return true; }
+  catch (e) { const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (_) {} ta.remove(); toast(ok ? (msg || "Copied") : "Couldn't copy. Long-press to select instead."); return ok; }
+}
+async function shareText(t) { if (navigator.share) { try { await navigator.share({ text: t }); return true; } catch (e) { return false; } } return copyText(t); }
+const canShare = () => !!navigator.share;
+
+/* ---------- finish / history ---------- */
+function finishWorkout() {
+  if (!hasContent(S)) { toast("Log at least one set first."); return; }
+  if (!S.header.end) S.header.end = nowHM();
+  const snap = JSON.parse(JSON.stringify(S));
+  const i = H.findIndex(h => h.id === S.id);
+  const entry = { id: S.id, savedAt: new Date().toISOString(), logged: false, state: snap };
+  if (i >= 0) H[i] = { ...entry, logged: H[i].logged }; else H.push(entry);
+  H.sort((a, b) => (a.state.header.date + (a.state.header.start || "")).localeCompare(b.state.header.date + (b.state.header.start || "")));
+  persistHist(); S = blankState(); persist(); view = "finished"; lastFinished = entry.id; render(); window.scrollTo(0, 0);
+}
+const unlogged = () => H.filter(h => !h.logged);
+function markLogged(ids) { H.forEach(h => { if (ids.includes(h.id)) h.logged = true; }); persistHist(); render(); }
+
+/* ---------- start from template ---------- */
+function startFromLast(f) {
+  const src = lastOfFocus(f); if (!src) return;
+  S.header.focus = f; if (!S.header.gym) S.header.gym = src.state.header.gym || "";
+  S.exercises = src.state.exercises.filter(e => e.name).map(e => ({ name: e.name, sets: e.sets.filter(st => st.weight || st.reps).map(st => ({ ...emptySet(), warm: !!st.warm })) }));
+  persist(); render(); toast(`Loaded your last ${f} workout. Previous numbers show as hints.`);
+}
+
+/* ---------- render ---------- */
+let view = "log", lastFinished = null;
+function render() {
+  const app = $("#app"); const active = document.activeElement; const fid = active && active.id; const pos = active && active.selectionStart;
+  $("#exList").innerHTML = knownNames().map(n => `<option value="${esc(n)}">`).join("");
+  app.innerHTML = view === "finished" ? finishedHTML() : view === "history" ? historyHTML() : logHTML();
+  if (fid) { const el = document.getElementById(fid); if (el) { el.focus(); try { if (pos != null) el.setSelectionRange(pos, pos); } catch (e) {} } }
+}
+function topBar(sub) {
+  return `<div class="top"><div><div class="title">GymSesh</div><div class="sub">${sub}</div></div>
+  <div class="row"><button class="btn" data-act="history">History${unlogged().length ? ` · ${unlogged().length}` : ""}</button>${view === "log" ? `<button class="btn" data-act="clear">Clear</button>` : `<button class="btn" data-act="back">Back</button>`}</div></div>`;
+}
+function nudgeHTML() {
+  const u = unlogged(); const last = H.length ? H[H.length - 1].state.header.date : null; const since = last ? daysBetween(last, localDate()) : null;
+  let out = "";
+  if (u.length) out += `<div class="banner warn"><b>${u.length} workout${u.length === 1 ? "" : "s"} not logged yet.</b> Send ${u.length === 1 ? "it" : "them"} to Claude so your log and dashboard stay current.
+    <div class="row" style="margin-top:8px"><button class="btn dark" data-act="${canShare() ? "share-unlogged" : "copy-unlogged"}">${canShare() ? "Share" : "Copy"} ${u.length === 1 ? "it" : "all " + u.length}</button>${canShare() ? `<button class="btn" data-act="copy-unlogged">Copy</button>` : ""}<button class="btn" data-act="mark-all">Mark as logged</button></div></div>`;
+  else if (since != null && since > 3 && !hasContent(S)) out += `<div class="banner">Last workout: <b>${since} days ago</b> (${esc(H[H.length - 1].state.header.focus || "workout")}). Today's a good day.</div>`;
+  return out;
+}
+function logHTML() {
+  const s = S; const o = s.optional;
+  const resumed = hasContent(s) && s.header.date !== localDate() ? `<div class="banner warn">This draft is from <b>${fmtDay(s.header.date)}</b>. Finish it, or tap Clear to start today's.</div>` : "";
+  const lf = s.header.focus && !hasContent(s) ? lastOfFocus(s.header.focus) : null;
+  return topBar(hasContent(s) ? "Saved on this phone as you type" : "Log as you lift") + nudgeHTML() + resumed + `
+  <div class="card">
+    <div class="grid2">
+      <label class="field label">Date<input class="in" type="date" id="h-date" data-h="date" value="${esc(s.header.date)}"></label>
+      <label class="field label">Gym / Location<input class="in" type="text" id="h-gym" data-h="gym" placeholder="e.g. EoS La Mirada" value="${esc(s.header.gym)}" list="gymList"></label>
+      <label class="field label">Start Time<div class="row" style="flex-wrap:nowrap"><input class="in" type="time" id="h-start" data-h="start" value="${esc(s.header.start)}"><button class="btn" data-act="now" data-k="start" aria-label="Set start to now">Now</button></div></label>
+      <label class="field label">End Time<div class="row" style="flex-wrap:nowrap"><input class="in" type="time" id="h-end" data-h="end" value="${esc(s.header.end)}"><button class="btn" data-act="now" data-k="end" aria-label="Set end to now">Now</button></div></label>
+    </div>
+    <datalist id="gymList">${[...new Set(H.map(h => h.state.header.gym).filter(Boolean).concat("EoS La Mirada", "Work Gym"))].map(g => `<option value="${esc(g)}">`).join("")}</datalist>
+    <div style="margin-top:12px"><div class="label" style="margin-bottom:6px">Workout Focus</div>
+      <div class="chips">${FOCUS_OPTIONS.map(f => `<button class="chip ${s.header.focus === f ? "on" : ""}" data-act="focus" data-k="${f}">${f}</button>`).join("")}</div>
+      ${lf ? `<button class="btn green" style="margin-top:10px" data-act="from-last" data-k="${esc(s.header.focus)}">Start from last ${esc(s.header.focus)} (${fmtDay(lf.state.header.date)})</button>` : ""}
+    </div>
+    <div style="margin-top:12px"><div class="label" style="margin-bottom:6px">Overall Energy (1&ndash;5)</div>
+      <div class="row" style="flex-wrap:nowrap">${[1, 2, 3, 4, 5].map(v => `<button class="en ${s.header.energy === v ? "on" : ""}" data-act="energy" data-k="${v}">${v}</button>`).join("")}</div></div>
+    <label class="field label" style="margin-top:12px">Overall Workout Notes<textarea class="in" id="h-notes" data-h="notes" rows="2" placeholder="How did the session feel overall?">${esc(s.header.notes)}</textarea></label>
+  </div>
+
+  <div class="label" style="margin:18px 0 8px">Exercises</div>
+  ${s.exercises.map((ex, i) => { const prev = lastFor(ex.name); return `
+  <div class="card" style="padding:12px">
+    <div class="exhead"><div class="num">${i + 1}</div>
+      <input class="exname" type="text" id="ex-${i}" data-ex="${i}" placeholder="Exercise name" value="${esc(ex.name)}" list="exList" autocomplete="off">
+      <button class="x" data-act="rm-ex" data-i="${i}" aria-label="Remove exercise">&times;</button></div>
+    ${prev ? `<div class="prev">Last time (${fmtDay(prev.date)}): ${prev.sets.map(st => `${st.weight || "-"}×${st.reps || "-"}`).join(" · ")}</div>` : ""}
+    <div class="setgrid sethdr"><div>Set</div><div>Weight</div><div>Reps</div><div>Rest</div><div>RPE</div><div></div></div>
+    ${ex.sets.map((st, j) => { const p = prev && prev.sets[j]; return `
+    <div class="setrow ${st.warm ? "warm" : ""}">
+      <div class="setgrid">
+        <button class="setno" data-act="warm" data-i="${i}" data-j="${j}" title="Tap to mark as warm-up" aria-label="Set ${j + 1}${st.warm ? ", warm-up" : ""}. Tap to toggle warm-up">${st.warm ? "W" : j + 1}</button>
+        <input class="s" type="text" inputmode="decimal" id="w-${i}-${j}" data-s="${i}-${j}" data-k="weight" placeholder="${p ? esc(p.weight) : "lb"}" value="${esc(st.weight)}">
+        <input class="s" type="text" inputmode="numeric" id="r-${i}-${j}" data-s="${i}-${j}" data-k="reps" placeholder="${p ? esc(p.reps) : "#"}" value="${esc(st.reps)}">
+        <input class="s" type="text" id="t-${i}-${j}" data-s="${i}-${j}" data-k="rest" placeholder="90s" value="${esc(st.rest)}">
+        <input class="s" type="text" inputmode="numeric" id="p-${i}-${j}" data-s="${i}-${j}" data-k="rpe" placeholder="-" value="${esc(st.rpe)}">
+        <button class="x" style="font-size:15px;color:#c9c6bf" data-act="rm-set" data-i="${i}" data-j="${j}" aria-label="Remove set">&times;</button>
+      </div>
+      <input class="setnote" type="text" id="n-${i}-${j}" data-s="${i}-${j}" data-k="notes" placeholder="Set note (form, pain, PR...)" value="${esc(st.notes)}">
+    </div>`; }).join("")}
+    <div class="row"><button class="addset" data-act="add-set" data-i="${i}">+ Add Set</button>${ex.sets.some(st => st.weight || st.reps) ? `<button class="addset" data-act="copy-set" data-i="${i}">+ Repeat last set</button>` : ""}</div>
+  </div>`; }).join("")}
+  <button class="btn green block" style="margin-bottom:20px" data-act="add-ex">+ Add Exercise</button>
+
+  <div class="label" style="margin:6px 0 8px">Optional</div>
+  <details class="card"><summary>Body Weight &amp; Measurements</summary><div style="margin-top:10px;display:grid;gap:8px">
+    <input class="in" type="text" id="o-bw" data-o="bodyWeight" placeholder="Body weight, e.g. 168 lb" value="${esc(o.bodyWeight)}">
+    <input class="in" type="text" id="o-me" data-o="measurements" placeholder="Measurements, e.g. waist 33in, arm 15in" value="${esc(o.measurements)}"></div></details>
+  <details class="card"><summary>Warm-up Notes</summary><textarea class="in" style="margin-top:10px" id="o-wu" data-o="warmup" rows="2" placeholder="What you did to warm up">${esc(o.warmup)}</textarea></details>
+  <details class="card"><summary>Cardio Completed</summary><div class="grid2" style="margin-top:10px">
+    <input class="in" type="text" id="o-ct" data-c="type" placeholder="Type, e.g. Incline walk" value="${esc(o.cardio.type)}">
+    <input class="in" type="text" id="o-cd" data-c="duration" placeholder="Duration, e.g. 20 min" value="${esc(o.cardio.duration)}">
+    <input class="in" type="text" id="o-cx" data-c="distance" placeholder="Distance (optional)" value="${esc(o.cardio.distance)}" style="grid-column:span 2"></div></details>
+  <details class="card"><summary>Stretching / Mobility</summary><textarea class="in" style="margin-top:10px" id="o-st" data-o="stretch" rows="2" placeholder="What you stretched or mobilized">${esc(o.stretch)}</textarea></details>
+  <details class="card"><summary>Personal Records</summary><textarea class="in" style="margin-top:10px" id="o-pr" data-o="prs" rows="2" placeholder="e.g. Bench 135lb x 5 - new PR">${esc(o.prs)}</textarea></details>
+  <details class="card"><summary>Pain / Discomfort / Form Notes</summary><textarea class="in" style="margin-top:10px" id="o-pa" data-o="pain" rows="2" placeholder="Anything that hurt or felt off">${esc(o.pain)}</textarea></details>
+  <details class="card" style="margin-bottom:20px"><summary>Workout Summary</summary><textarea class="in" style="margin-top:10px" id="o-su" data-o="summary" rows="2" placeholder="Quick recap for future you / Claude">${esc(o.summary)}</textarea></details>
+
+  <button class="btn dark block" data-act="finish">Finish workout</button>
+  <div class="hint">Saves it on this phone and adds it to your "not logged yet" list.</div>
+  <div class="row" style="justify-content:center;margin-bottom:20px">${canShare() ? `<button class="btn" data-act="share-current">Share now</button>` : ""}<button class="btn" data-act="copy-current">Copy as Text</button></div>
+
+  <details class="card"><summary class="small muted" style="font-weight:600">How to use this tracker</summary><div class="small" style="margin-top:10px;color:#4a4844">
+    <b>Before:</b> pick your focus. If you've done it before, tap <i>Start from last</i> to load the same exercises with last time's numbers as hints.<br>
+    <b>During:</b> log each set right away. Tap the set number to mark a warm-up. Everything saves on this phone as you type.<br>
+    <b>After:</b> tap <i>Finish workout</i>, then <i>Share</i> it to Claude. Claude updates your log and the dashboard, and gives feedback.</div></details>
+  <details class="card"><summary class="small muted" style="font-weight:600">Tips to improve over time</summary><div class="small" style="margin-top:10px;color:#4a4844">
+    Keep RPE on the same 1&ndash;10 scale every session so trends are comparable. Log body weight weekly, not daily, same time of day. Pick exercise names from the suggestions so every session lines up in your log.</div></details>`;
+}
+function finishedHTML() {
+  const e = H.find(h => h.id === lastFinished); if (!e) { view = "log"; return logHTML(); }
+  const s = e.state; const sets = s.exercises.reduce((a, x) => a + x.sets.filter(st => (st.weight || st.reps) && !st.warm).length, 0);
+  const wk = (() => { const d = new Date(); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return localDate(d); })();
+  const thisWeek = new Set(H.filter(h => h.state.header.date >= wk).map(h => h.state.header.date)).size;
+  return topBar("Workout saved") + `<div class="card" style="text-align:center;padding:22px 16px">
+    <div class="label">Saved on this phone</div>
+    <div style="font-size:26px;font-weight:700;margin:6px 0">${esc(s.header.focus || "Workout")} · ${fmtDay(s.header.date)}</div>
+    <div class="muted small">${sets} working sets · ${thisWeek} workout${thisWeek === 1 ? "" : "s"} this week</div>
+    <div class="row" style="justify-content:center;margin-top:16px">
+      ${canShare() ? `<button class="btn dark" style="padding:12px 18px;font-size:14px" data-act="share-one" data-id="${e.id}">Share to Claude</button>` : ""}
+      <button class="btn ${canShare() ? "" : "dark"}" style="padding:12px 18px;font-size:14px" data-act="copy-one" data-id="${e.id}">Copy as Text</button></div>
+    <div class="row" style="justify-content:center;margin-top:10px"><button class="btn" data-act="mark-one" data-id="${e.id}">${e.logged ? "Logged ✓" : "I've sent it, mark as logged"}</button></div>
+    <p class="small muted" style="margin:14px 0 0">Not sending it right now? It stays in your "not logged yet" list until you do.</p></div>
+    <button class="btn green block" data-act="back">Start a new workout</button>`;
+}
+function historyHTML() {
+  const items = [...H].reverse();
+  return topBar(`${H.length} saved on this phone`) + nudgeHTML() + `<div class="card">${items.length ? items.map(h => { const s = h.state; return `
+    <div class="hist-item"><div style="flex:1;min-width:0"><b>${esc(s.header.focus || "Workout")}</b> · ${fmtDay(s.header.date)}<div class="small muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.exercises.map(e => e.name).filter(Boolean).join(", "))}</div></div>
+      <span class="pill ${h.logged ? "done" : "todo"}">${h.logged ? "Logged" : "Not logged"}</span>
+      <button class="btn" data-act="copy-one" data-id="${h.id}">Copy</button>
+      ${h.logged ? `<button class="btn" data-act="unmark-one" data-id="${h.id}" aria-label="Mark as not logged">↺</button>` : `<button class="btn" data-act="mark-one" data-id="${h.id}">✓</button>`}
+      <button class="btn" data-act="del-one" data-id="${h.id}" aria-label="Delete from this phone">&times;</button></div>`; }).join("") : `<p class="muted small" style="margin:0">Finished workouts show up here.</p>`}</div>
+    <p class="small muted">History lives in this browser on this phone. Your permanent record is workout-log.csv once Claude logs it.</p>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("input", ev => {
+  const t = ev.target;
+  if (t.dataset.h) { S.header[t.dataset.h] = t.value; persist(); return; }
+  if (t.dataset.ex != null) { S.exercises[+t.dataset.ex].name = t.value; persist(); return; }
+  if (t.dataset.s) { const [i, j] = t.dataset.s.split("-").map(Number); S.exercises[i].sets[j][t.dataset.k] = t.value; persist(); return; }
+  if (t.dataset.o) { S.optional[t.dataset.o] = t.value; persist(); return; }
+  if (t.dataset.c) { S.optional.cardio[t.dataset.c] = t.value; persist(); return; }
+});
+document.addEventListener("change", ev => { const t = ev.target; if (t.dataset.ex != null) render(); /* show "last time" hints for the chosen exercise */ if (t.dataset.h === "date") render(); });
+let clearArmed = false, delArmed = null;
+document.addEventListener("click", async ev => {
+  const b = ev.target.closest("[data-act]"); if (!b) return;
+  const a = b.dataset.act, i = +b.dataset.i, j = +b.dataset.j, id = b.dataset.id;
+  const entry = id ? H.find(h => h.id === id) : null;
+  switch (a) {
+    case "focus": S.header.focus = S.header.focus === b.dataset.k ? "" : b.dataset.k; if (!S.header.start && S.header.focus) S.header.start = nowHM(); break;
+    case "energy": S.header.energy = S.header.energy === +b.dataset.k ? 0 : +b.dataset.k; break;
+    case "now": S.header[b.dataset.k] = nowHM(); break;
+    case "from-last": startFromLast(b.dataset.k); return;
+    case "add-ex": S.exercises.push(emptyExercise(4)); break;
+    case "rm-ex": S.exercises.splice(i, 1); break;
+    case "add-set": S.exercises[i].sets.push(emptySet()); break;
+    case "copy-set": { const sets = S.exercises[i].sets; const last = [...sets].reverse().find(st => st.weight || st.reps); const nx = sets.find((st, k) => k > sets.indexOf(last) && !st.weight && !st.reps); const vals = { weight: last.weight, reps: last.reps, rest: last.rest }; if (nx) Object.assign(nx, vals); else sets.push({ ...emptySet(), ...vals }); break; }
+    case "rm-set": S.exercises[i].sets.splice(j, 1); break;
+    case "warm": S.exercises[i].sets[j].warm = !S.exercises[i].sets[j].warm; break;
+    case "clear":
+      if (hasContent(S) && !clearArmed) { clearArmed = true; b.textContent = "Tap again to clear"; setTimeout(() => { clearArmed = false; if (b.isConnected) b.textContent = "Clear"; }, 3000); return; }
+      clearArmed = false; S = blankState(); break;
+    case "finish": finishWorkout(); return;
+    case "copy-current": copyText(toText(S)); return;
+    case "share-current": shareText(toText(S)); return;
+    case "copy-one": copyText(toText(entry.state)); return;
+    case "share-one": if (await shareText(toText(entry.state))) { /* user chose a target */ } return;
+    case "mark-one": entry.logged = true; persistHist(); render(); toast("Marked as logged"); return;
+    case "unmark-one": entry.logged = false; persistHist(); render(); return;
+    case "del-one": if (delArmed !== id) { delArmed = id; b.textContent = "Delete?"; setTimeout(() => { delArmed = null; if (b.isConnected) b.innerHTML = "&times;"; }, 3000); return; } H = H.filter(h => h.id !== id); persistHist(); render(); return;
+    case "copy-unlogged": copyText(unlogged().map(h => toText(h.state)).join("\n\n"), `Copied ${unlogged().length} workout${unlogged().length === 1 ? "" : "s"}`); return;
+    case "share-unlogged": shareText(unlogged().map(h => toText(h.state)).join("\n\n")); return;
+    case "mark-all": markLogged(unlogged().map(h => h.id)); toast("All marked as logged"); return;
+    case "history": view = "history"; render(); window.scrollTo(0, 0); return;
+    case "back": view = "log"; render(); window.scrollTo(0, 0); return;
+  }
+  persist(); render();
+});
+document.addEventListener("visibilitychange", () => { if (document.hidden) save(KEY_DRAFT, S); });
+window.addEventListener("pagehide", () => save(KEY_DRAFT, S));
+render();
+</script>
 </body>
 </html>
