@@ -106,10 +106,10 @@ const $ = s => document.querySelector(s);
 
 /* Canonical names (match workout-log.csv and Lift Dashboard) */
 const EXERCISES = ["Bench Press (Barbell)", "Barbell Squat", "Deadlift", "Barbell Bent-Over Row", "Overhead Press", "Romanian Deadlift",
-  "Dumbbell Bench Press", "Incline DB Bench Press", "Incline Bench Press (Barbell)", "DB Shoulder Press", "Lateral Raises (DB)", "Pec Flies Machine", "Chest Press Machine",
-  "Tricep Rope Pushdown", "Overhead Cable Tricep Extension (Rope)", "Overhead Tricep Cable Extension (Single Arm)", "Overhead DB Extension",
+  "Dumbbell Bench Press", "Incline DB Bench Press", "Incline Bench Press (Barbell)", "DB Shoulder Press", "Lateral Raises (DB)", "Pec Flies Machine", "Chest Press Machine", "Incline Press Machine", "Tricep Press Machine",
+  "Tricep Rope Pushdown", "Overhead Cable Tricep Extension (Rope)", "Overhead Cable Tricep Extension (Straight Bar)", "Overhead Tricep Cable Extension (Single Arm)", "Overhead DB Extension",
   "Lat Pulldown", "Seated Cable Row", "Lever Row", "Rear Delt Fly", "Face Pulls", "Pull-ups", "EZ Bar Curl", "Bicep Curl Machine", "Dumbbell Hammer Curls",
-  "Leg Press Machine", "Leg Extension Machine", "Seated Leg Curl", "Hamstring Curl Machine", "Adduction Machine", "Abduction Machine", "Goblet Squat", "Calf Raise", "Ab Crunch Machine"];
+  "Leg Press Machine", "Angled Leg Press", "Leg Extension Machine", "Seated Leg Curl", "Hamstring Curl Machine", "Adduction Machine", "Abduction Machine", "Goblet Squat", "Calf Raise", "Ab Crunch Machine"];
 const FOCUS_OPTIONS = ["Push", "Pull", "Legs", "Upper Body", "Lower Body", "Full Body", "Cardio", "Mobility", "Custom"];
 
 const emptySet = () => ({ weight: "", reps: "", rest: "", rpe: "", notes: "", warm: false });
@@ -240,7 +240,8 @@ function logHTML() {
     <label class="field label" style="margin-top:12px">Overall Workout Notes<textarea class="in" id="h-notes" data-h="notes" rows="2" placeholder="How did the session feel overall?">${esc(s.header.notes)}</textarea></label>
   </div>
 
-  <div class="label" style="margin:18px 0 8px">Exercises</div>
+  <div class="label" style="margin:18px 0 4px">Exercises</div>
+  <p class="small muted" style="margin:0 0 8px">RPE = how hard the set was, not energy left. 10 = no reps left, 8 = 2 left, 6 = 4 left.</p>
   ${s.exercises.map((ex, i) => { const prev = lastFor(ex.name); return `
   <div class="card" style="padding:12px">
     <div class="exhead"><div class="num">${i + 1}</div>
@@ -255,7 +256,7 @@ function logHTML() {
         <input class="s" type="text" inputmode="decimal" id="w-${i}-${j}" data-s="${i}-${j}" data-k="weight" aria-label="Weight (lb)" placeholder="${p ? esc(p.weight) : "lb"}" value="${esc(st.weight)}">
         <input class="s" type="text" inputmode="numeric" id="r-${i}-${j}" data-s="${i}-${j}" data-k="reps" aria-label="Reps" placeholder="${p ? esc(p.reps) : "#"}" value="${esc(st.reps)}">
         <input class="s" type="text" id="t-${i}-${j}" data-s="${i}-${j}" data-k="rest" aria-label="Rest (seconds)" placeholder="90s" value="${esc(st.rest)}">
-        <input class="s" type="text" inputmode="numeric" id="p-${i}-${j}" data-s="${i}-${j}" data-k="rpe" aria-label="RPE" placeholder="-" value="${esc(st.rpe)}">
+        <input class="s" type="text" inputmode="numeric" id="p-${i}-${j}" data-s="${i}-${j}" data-k="rpe" aria-label="RPE (10 = no reps left)" placeholder="-" value="${esc(st.rpe)}">
         <button class="x" style="font-size:15px;color:#c9c6bf" data-act="rm-set" data-i="${i}" data-j="${j}" aria-label="Remove set">&times;</button>
       </div>
       <input class="setnote" type="text" id="n-${i}-${j}" data-s="${i}-${j}" data-k="notes" placeholder="Set note (form, pain, PR...)" value="${esc(st.notes)}">
@@ -287,7 +288,7 @@ function logHTML() {
     <b>During:</b> log each set right away. Tap the set number to mark a warm-up. Everything saves on this phone as you type.<br>
     <b>After:</b> tap <i>Finish workout</i>, then <i>Share</i> it to Claude. Claude updates your log and the dashboard, and gives feedback.</div></details>
   <details class="card"><summary class="small muted" style="font-weight:600">Tips to improve over time</summary><div class="small" style="margin-top:10px;color:#4a4844">
-    Keep RPE on the same 1&ndash;10 scale every session so trends are comparable. Log body weight weekly, not daily, same time of day. Pick exercise names from the suggestions so every session lines up in your log.</div></details>`;
+    Keep RPE on the same 1&ndash;10 effort scale every session (10 = no reps left) so trends are comparable. RPE should rise as the weight gets heavier. Log body weight weekly, not daily, same time of day. Pick exercise names from the suggestions so every session lines up in your log.</div></details>`;
 }
 function finishedHTML() {
   const e = H.find(h => h.id === lastFinished); if (!e) { view = "log"; return logHTML(); }
