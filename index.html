@@ -9,8 +9,9 @@
 <title>GymSesh — Workout Tracker</title>
 <meta name="description" content="GymSesh is a fast, offline-friendly workout tracker — log sets, reps, weight and rest right from your phone.">
 <link rel="canonical" href="https://rodneysagmit.github.io/GymSesh/">
-<link rel="icon" href="icon.webp" type="image/webp">
-<link rel="apple-touch-icon" href="icon.webp">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="GymSesh — Workout Tracker">
 <meta property="og:description" content="GymSesh is a fast, offline-friendly workout tracker — log sets, reps, weight and rest right from your phone.">
@@ -20,12 +21,12 @@
 <meta name="twitter:title" content="GymSesh — Workout Tracker">
 <meta name="twitter:description" content="GymSesh is a fast, offline-friendly workout tracker — log sets, reps, weight and rest right from your phone.">
 <style>
-  :root { --bg:#fdfdfb; --ink:#1a1a1a; --muted:#6f6c66; --faint:#a3a099; --line:#e3e0d8; --field:#dcd9d1; --soft:#f1efe9;
+  :root { --bg:#fdfdfb; --ink:#1a1a1a; --muted:#6f6c66; --faint:#79756d; --line:#e3e0d8; --field:#dcd9d1; --soft:#f1efe9;
     --g:oklch(0.6 0.15 150); --g-ink:oklch(0.4 0.13 150); --g-soft:oklch(0.6 0.15 150 / 0.14); --warn:#9a6b00; --warn-soft:#fbf0d2; }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: Helvetica, Arial, sans-serif; line-height: 1.35; -webkit-tap-highlight-color: transparent; }
   input, textarea, select, button { font-family: inherit; color: inherit; }
-  ::placeholder { color: #b3b0aa; }
+  ::placeholder { color: #79756c; }
   details > summary { cursor: pointer; list-style: none; }
   details > summary::-webkit-details-marker { display: none; }
   .wrap { max-width: 640px; margin: 0 auto; padding: 16px 16px calc(60px + env(safe-area-inset-bottom, 0px)); }
@@ -362,6 +363,14 @@ document.addEventListener("click", async ev => {
 });
 document.addEventListener("visibilitychange", () => { if (document.hidden) save(KEY_DRAFT, S); });
 window.addEventListener("pagehide", () => save(KEY_DRAFT, S));
+
+/* ---------- service worker (offline / installable) ---------- */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+
 render();
 </script>
 </body>
