@@ -53,7 +53,7 @@
   .num { width:26px; height:26px; border-radius:7px; background:var(--g-soft); color:var(--g-ink); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .exname { flex:1; min-width:0; border:none; border-bottom:1px solid var(--field); padding:6px 2px; font-size:15px; font-weight:600; background:transparent; }
   .x { border:none; background:transparent; color:#b3b0aa; font-size:18px; line-height:1; padding:4px; cursor:pointer; }
-  .setgrid { display:grid; grid-template-columns:26px 1fr 1fr 1fr 40px 20px; gap:6px; align-items:center; }
+  .setgrid { display:grid; grid-template-columns:26px 1fr 1fr 1fr 20px; gap:6px; align-items:center; }
   .sethdr { font-size:10px; font-weight:600; color:var(--faint); text-transform:uppercase; letter-spacing:0.02em; padding:0 2px 4px; text-align:center; }
   .setrow { margin-bottom:6px; padding-bottom:6px; border-bottom:1px solid var(--soft); }
   .setrow input.s { width:100%; min-width:0; border:1px solid var(--field); border-radius:6px; padding:7px 4px; font-size:14px; text-align:center; background:#fff; }
@@ -112,7 +112,7 @@ const EXERCISES = ["Bench Press (Barbell)", "Barbell Squat", "Deadlift", "Barbel
   "Leg Press Machine", "Angled Leg Press", "Leg Extension Machine", "Seated Leg Curl", "Hamstring Curl Machine", "Adduction Machine", "Abduction Machine", "Goblet Squat", "Calf Raise", "Ab Crunch Machine"];
 const FOCUS_OPTIONS = ["Push", "Pull", "Legs", "Upper Body", "Lower Body", "Full Body", "Cardio", "Mobility", "Custom"];
 
-const emptySet = () => ({ weight: "", reps: "", rest: "", rpe: "", notes: "", warm: false });
+const emptySet = () => ({ weight: "", reps: "", rest: "", notes: "", warm: false });
 const emptyExercise = n => ({ name: "", sets: Array.from({ length: n }, emptySet) });
 const blankState = () => ({
   id: "w" + Date.now().toString(36),
@@ -150,8 +150,8 @@ function toText(s) {
     n++; lines.push(`${n}. ${ex.name || "(unnamed)"}`);
     let k = 0;
     ex.sets.forEach(st => {
-      if (!st.weight && !st.reps && !st.rest && !st.rpe && !st.notes) return;
-      k++; lines.push(`   Set ${k}${st.warm ? " (warm-up)" : ""}: ${st.weight || "-"} x ${st.reps || "-"} | rest ${st.rest || "-"} | RPE ${st.rpe || "-"}${st.notes ? " | " + st.notes : ""}`);
+      if (!st.weight && !st.reps && !st.rest && !st.notes) return;
+      k++; lines.push(`   Set ${k}${st.warm ? " (warm-up)" : ""}: ${st.weight || "-"} x ${st.reps || "-"} | rest ${st.rest || "-"}${st.notes ? " | " + st.notes : ""}`);
     });
   });
   const o = s.optional; lines.push("", "OPTIONAL");
@@ -240,15 +240,14 @@ function logHTML() {
     <label class="field label" style="margin-top:12px">Overall Workout Notes<textarea class="in" id="h-notes" data-h="notes" rows="2" placeholder="How did the session feel overall?">${esc(s.header.notes)}</textarea></label>
   </div>
 
-  <div class="label" style="margin:18px 0 4px">Exercises</div>
-  <p class="small muted" style="margin:0 0 8px">RPE = how hard the set was, not energy left. 10 = no reps left, 8 = 2 left, 6 = 4 left.</p>
+  <div class="label" style="margin:18px 0 8px">Exercises</div>
   ${s.exercises.map((ex, i) => { const prev = lastFor(ex.name); return `
   <div class="card" style="padding:12px">
     <div class="exhead"><div class="num">${i + 1}</div>
       <input class="exname" type="text" id="ex-${i}" data-ex="${i}" placeholder="Exercise name" value="${esc(ex.name)}" list="exList" autocomplete="off">
       <button class="x" data-act="rm-ex" data-i="${i}" aria-label="Remove exercise">&times;</button></div>
     ${prev ? `<div class="prev">Last time (${fmtDay(prev.date)}): ${prev.sets.map(st => `${st.weight || "-"}×${st.reps || "-"}`).join(" · ")}</div>` : ""}
-    <div class="setgrid sethdr"><div>Set</div><div>Weight</div><div>Reps</div><div>Rest</div><div>RPE</div><div></div></div>
+    <div class="setgrid sethdr"><div>Set</div><div>Weight</div><div>Reps</div><div>Rest</div><div></div></div>
     ${ex.sets.map((st, j) => { const p = prev && prev.sets[j]; return `
     <div class="setrow ${st.warm ? "warm" : ""}">
       <div class="setgrid">
@@ -256,7 +255,6 @@ function logHTML() {
         <input class="s" type="text" inputmode="decimal" id="w-${i}-${j}" data-s="${i}-${j}" data-k="weight" aria-label="Weight (lb)" placeholder="${p ? esc(p.weight) : "lb"}" value="${esc(st.weight)}">
         <input class="s" type="text" inputmode="numeric" id="r-${i}-${j}" data-s="${i}-${j}" data-k="reps" aria-label="Reps" placeholder="${p ? esc(p.reps) : "#"}" value="${esc(st.reps)}">
         <input class="s" type="text" id="t-${i}-${j}" data-s="${i}-${j}" data-k="rest" aria-label="Rest (seconds)" placeholder="90s" value="${esc(st.rest)}">
-        <input class="s" type="text" inputmode="numeric" id="p-${i}-${j}" data-s="${i}-${j}" data-k="rpe" aria-label="RPE (10 = no reps left)" placeholder="-" value="${esc(st.rpe)}">
         <button class="x" style="font-size:15px;color:#c9c6bf" data-act="rm-set" data-i="${i}" data-j="${j}" aria-label="Remove set">&times;</button>
       </div>
       <input class="setnote" type="text" id="n-${i}-${j}" data-s="${i}-${j}" data-k="notes" placeholder="Set note (form, pain, PR...)" value="${esc(st.notes)}">
@@ -288,7 +286,7 @@ function logHTML() {
     <b>During:</b> log each set right away. Tap the set number to mark a warm-up. Everything saves on this phone as you type.<br>
     <b>After:</b> tap <i>Finish workout</i>, then <i>Share</i> it to Claude. Claude updates your log and the dashboard, and gives feedback.</div></details>
   <details class="card"><summary class="small muted" style="font-weight:600">Tips to improve over time</summary><div class="small" style="margin-top:10px;color:#4a4844">
-    Keep RPE on the same 1&ndash;10 effort scale every session (10 = no reps left) so trends are comparable. RPE should rise as the weight gets heavier. Log body weight weekly, not daily, same time of day. Pick exercise names from the suggestions so every session lines up in your log.</div></details>`;
+    Log body weight weekly, not daily, same time of day. Pick exercise names from the suggestions so every session lines up in your log.</div></details>`;
 }
 function finishedHTML() {
   const e = H.find(h => h.id === lastFinished); if (!e) { view = "log"; return logHTML(); }
