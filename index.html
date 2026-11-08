@@ -155,8 +155,11 @@ function lastOfFocus(f) { for (let i = H.length - 1; i >= 0; i--) if (H[i].state
 const hasContent = st => st.exercises.some(e => e.name || e.sets.some(s => s.weight || s.reps));
 
 /* ---------- text export (format read by /gym and Lift Dashboard) ---------- */
+// Canonical gym names, so the log never gets two names for one gym.
+const GYM_ALIASES = { "work gym": "GLA VAMC" };
+const normGym = g => { const k = String(g || "").trim(); return GYM_ALIASES[k.toLowerCase()] || k; };
 function toText(s) {
-  const lines = ["WORKOUT LOG", `Date: ${s.header.date || "-"}`, `Time: ${s.header.start || "-"} to ${s.header.end || "-"}`, `Gym: ${s.header.gym || "-"}`, `Focus: ${s.header.focus || "-"}`, `Energy: ${s.header.energy || "-"}/5`];
+  const lines = ["WORKOUT LOG", `Date: ${s.header.date || "-"}`, `Time: ${s.header.start || "-"} to ${s.header.end || "-"}`, `Gym: ${normGym(s.header.gym) || "-"}`, `Focus: ${s.header.focus || "-"}`, `Energy: ${s.header.energy || "-"}/5`];
   if (s.header.notes) lines.push(`Notes: ${s.header.notes}`);
   lines.push("", "EXERCISES");
   let n = 0;
@@ -262,7 +265,7 @@ function logHTML() {
       <label class="field label">Start Time<div class="row" style="flex-wrap:nowrap"><input class="in" type="time" id="h-start" data-h="start" value="${esc(s.header.start)}"><button class="btn" data-act="now" data-k="start" aria-label="Set start to now">Now</button></div></label>
       <label class="field label">End Time<div class="row" style="flex-wrap:nowrap"><input class="in" type="time" id="h-end" data-h="end" value="${esc(s.header.end)}"><button class="btn" data-act="now" data-k="end" aria-label="Set end to now">Now</button></div></label>
     </div>
-    <datalist id="gymList">${[...new Set(H.map(h => h.state.header.gym).filter(Boolean).concat("EoS La Mirada", "Work Gym"))].map(g => `<option value="${esc(g)}">`).join("")}</datalist>
+    <datalist id="gymList">${[...new Set(H.map(h => h.state.header.gym).filter(Boolean).map(normGym).concat("EoS La Mirada", "GLA VAMC"))].map(g => `<option value="${esc(g)}">`).join("")}</datalist>
     <div style="margin-top:12px"><div class="label" style="margin-bottom:6px">Workout Focus</div>
       <div class="chips">${FOCUS_OPTIONS.map(f => `<button class="chip ${s.header.focus === f ? "on" : ""}" data-act="focus" data-k="${f}">${f}</button>`).join("")}</div>
       ${lf ? `<button class="btn green" style="margin-top:10px" data-act="from-last" data-k="${esc(s.header.focus)}">Start from last ${esc(s.header.focus)} (${fmtDay(lf.state.header.date)})</button>` : ""}
